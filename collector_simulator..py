@@ -14,6 +14,8 @@ HEIGHT = 500
 STEP = 10
 screen = pygame.display.set_mode(size)
 clock = pygame.time.Clock()
+level_list = ['level1.txt', 'level2.txt', 'level3.txt', 'level4.txt', 'level5.txt']
+item_qa = 0
 
 
 def load_image(name, colorkey=None):
@@ -43,6 +45,9 @@ def generate_level(level):
         for x in range(len(level[y])):
             if level[y][x] == '.':
                 Tile('empty', x, y)
+                if item_qa < 5:
+                    Tile('empty', x, y)
+                    Item(item_group, x, y)
             elif level[y][x] == '#':
                 Tile('wall', x, y)
             elif level[y][x] == '@':
@@ -86,7 +91,7 @@ def terminate():
 
 tile_images = {'wall': load_image('stena.png'), 'empty': load_image('pol.png')}
 player_image = load_image('player.png', -1)
-
+item_images = ['axe.png', 'crown.png', 'ring.png', 'spear.png', 'sword.png']
 tile_width = tile_height = 50
 
 
@@ -110,14 +115,29 @@ class Player(pygame.sprite.Sprite):
             self.rect = self.rect.move(x, y)
 
 
+class Item(pygame.sprite.Sprite):
+    image = load_image("axe.png")
+
+    def __init__(self, group, x, y):
+        super().__init__(group)
+        self.image = Item.image
+        self.rect = self.image.get_rect()
+        while True:
+            self.rect.topleft = (
+                x, y)
+            '''if len(pygame.sprite.spritecollide(self, all_sprites, False)) == 1:
+                break'''
+
+
 # start_screen()
 
 all_sprites = pygame.sprite.Group()
 tiles_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
+item_group = pygame.sprite.Group()
 
 level_map = None
-player, level_x, level_y = generate_level(load_level('level5.txt'))
+player, level_x, level_y = generate_level(load_level('level4.txt'))
 run = True
 while run:
     for event in pygame.event.get():
