@@ -1,6 +1,7 @@
-import pygame
 import os
 import sys
+
+import pygame
 
 pygame.init()
 size = width, height = 800, 800
@@ -83,7 +84,6 @@ def terminate():
         pygame.display.flip()
         clock.tick(FPS)'''
 
-
 tile_images = {'wall': load_image('stena.png'), 'empty': load_image('pol.png')}
 player_image = load_image('player.png', -1)
 
@@ -105,19 +105,19 @@ class Player(pygame.sprite.Sprite):
 
     def update(self, x, y):
         if 0 <= self.rect.y + y < height and 0 <= self.rect.x + x < width and \
-                level_map[(self.rect.y + y) // tile_height][(self.rect.x + x) // tile_width] in ('.', '@'):
+                level_map[(self.rect.y + y) // tile_height][(self.rect.x + x) // tile_width] in (
+                '.', '@'):
             self.rect = self.rect.move(x, y)
 
 
-#start_screen()
+# start_screen()
 
 all_sprites = pygame.sprite.Group()
 tiles_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
 
-
 level_map = None
-player, level_x, level_y = generate_level(load_level('map.txt'))
+player, level_x, level_y = generate_level(load_level('level5.txt'))
 run = True
 while run:
     for event in pygame.event.get():
