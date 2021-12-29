@@ -1,12 +1,13 @@
 import os
+import random
 import sys
 
 import pygame
 
 pygame.init()
-size = width, height = 800, 800
+size = width, height = 600, 600
 
-pygame.display.set_caption('Program')
+pygame.display.set_caption('Collector simulator')
 pygame.key.set_repeat(200, 300)
 FPS = 50
 WIDTH = 500
@@ -15,7 +16,7 @@ STEP = 10
 screen = pygame.display.set_mode(size)
 clock = pygame.time.Clock()
 level_list = ['level1.txt', 'level2.txt', 'level3.txt', 'level4.txt', 'level5.txt']
-item_qa = 0
+items = ['axe.png', 'ring.png', 'sword.png', 'spear.png', 'crown.png']
 
 
 def load_image(name, colorkey=None):
@@ -40,14 +41,28 @@ def load_level(filename):
 
 
 def generate_level(level):
+    posl = range(11)
+    cords = []
+    for i in range(5):
+        flag = True
+        while flag:
+            k = random.choice(posl)
+            w = random.choice(posl)
+            if level[k][w] == '.' and (k, w) not in cords:
+                cords.append((k, w))
+                flag = False
+
+    item_qa = 0
+    item_num = 0
     new_player, x, y = None, None, None
     for y in range(len(level)):
         for x in range(len(level[y])):
             if level[y][x] == '.':
                 Tile('empty', x, y)
                 if item_qa < 5:
-                    Tile('empty', x, y)
-                    Item(item_group, x, y)
+                    Item(cords[item_num][1], cords[item_num][0], items[item_num])
+                    item_qa += 1
+                    item_num += 1
             elif level[y][x] == '#':
                 Tile('wall', x, y)
             elif level[y][x] == '@':
@@ -91,7 +106,7 @@ def terminate():
 
 tile_images = {'wall': load_image('stena.png'), 'empty': load_image('pol.png')}
 player_image = load_image('player.png', -1)
-item_images = ['axe.png', 'crown.png', 'ring.png', 'spear.png', 'sword.png']
+# item_images = load_image('crown.png', -1)
 tile_width = tile_height = 50
 
 
@@ -116,17 +131,10 @@ class Player(pygame.sprite.Sprite):
 
 
 class Item(pygame.sprite.Sprite):
-    image = load_image("axe.png")
-
-    def __init__(self, group, x, y):
-        super().__init__(group)
-        self.image = Item.image
-        self.rect = self.image.get_rect()
-        while True:
-            self.rect.topleft = (
-                x, y)
-            '''if len(pygame.sprite.spritecollide(self, all_sprites, False)) == 1:
-                break'''
+    def __init__(self, pos_x, pos_y, name):
+        super().__init__(player_group, all_sprites)
+        self.image = load_image(name, -1)
+        self.rect = self.image.get_rect().move(tile_width * pos_x + 15, tile_height * pos_y + 5)
 
 
 # start_screen()
@@ -137,7 +145,7 @@ player_group = pygame.sprite.Group()
 item_group = pygame.sprite.Group()
 
 level_map = None
-player, level_x, level_y = generate_level(load_level('level4.txt'))
+player, level_x, level_y = generate_level(load_level('level5.txt'))
 run = True
 while run:
     for event in pygame.event.get():
