@@ -145,7 +145,7 @@ player_group = pygame.sprite.Group()
 item_group = pygame.sprite.Group()
 
 level_map = None
-player, level_x, level_y = generate_level(load_level('level5.txt'))
+player, level_x, level_y = generate_level(load_level('level4.txt'))
 run = True
 while run:
     for event in pygame.event.get():
