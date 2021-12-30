@@ -5,7 +5,7 @@ import sys
 import pygame
 
 pygame.init()
-size = width, height = 600, 600
+size = width, height = 800, 550
 
 pygame.display.set_caption('Collector simulator')
 pygame.key.set_repeat(200, 300)
@@ -17,7 +17,7 @@ screen = pygame.display.set_mode(size)
 clock = pygame.time.Clock()
 level_list = ['level1.txt', 'level2.txt', 'level3.txt', 'level4.txt', 'level5.txt']
 items = ['axe.png', 'ring.png', 'sword.png', 'spear.png', 'crown.png']
-
+sp =[]
 
 def load_image(name, colorkey=None):
     fullname = os.path.join('data', name)
@@ -76,24 +76,24 @@ def terminate():
     sys.exit()
 
 
-'''def start_screen():
+def start_screen():
     intro_text = ["ЗАСТАВКА",
                   "Правила игры",
                   "Если в правилах несколько строк,",
                   "приходится выводить их построчно"]
 
-    fon = pygame.transform.scale(load_image('fon.jpg'), (WIDTH, HEIGHT))
+    fon = pygame.transform.scale(load_image('game design.jpg'), (800, 550))
     screen.blit(fon, (0, 0))
     font = pygame.font.Font(None, 30)
     text_coord = 50
-    for line in intro_text:
+    '''for line in intro_text:
         string_rendered = font.render(line, 1, pygame.Color('black'))
         intro_rect = string_rendered.get_rect()
         text_coord += 10
         intro_rect.top = text_coord
         intro_rect.x = 10
         text_coord += intro_rect.height
-        screen.blit(string_rendered, intro_rect)
+        screen.blit(string_rendered, intro_rect)'''
 
     while True:
         for event in pygame.event.get():
@@ -102,11 +102,11 @@ def terminate():
             elif event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
                 return
         pygame.display.flip()
-        clock.tick(FPS)'''
+        clock.tick(FPS)
+
 
 tile_images = {'wall': load_image('stena.png'), 'empty': load_image('pol.png')}
 player_image = load_image('player.png', -1)
-# item_images = load_image('crown.png', -1)
 tile_width = tile_height = 50
 
 
@@ -122,6 +122,7 @@ class Player(pygame.sprite.Sprite):
         super().__init__(player_group, all_sprites)
         self.image = player_image
         self.rect = self.image.get_rect().move(tile_width * pos_x + 15, tile_height * pos_y + 5)
+        self.mask = pygame.mask.from_surface(self.image)
 
     def update(self, x, y):
         if 0 <= self.rect.y + y < height and 0 <= self.rect.x + x < width and \
@@ -131,10 +132,21 @@ class Player(pygame.sprite.Sprite):
 
 
 class Item(pygame.sprite.Sprite):
+
     def __init__(self, pos_x, pos_y, name):
-        super().__init__(player_group, all_sprites)
-        self.image = load_image(name, -1)
+        self.sp = sp
+        self.name = name
+        super().__init__(item_group, all_sprites)
+        self.image = load_image(self.name, -1)
         self.rect = self.image.get_rect().move(tile_width * pos_x + 15, tile_height * pos_y + 5)
+        self.mask = pygame.mask.from_surface(self.image)
+
+    def update(self):
+        if pygame.sprite.spritecollideany(self, player_group):
+            self.sp.append(self.name)
+            self.rect = self.image.get_rect().move(800, 550)
+            self.image.set_colorkey((255, 255, 255))
+            print(self.sp)
 
 
 # start_screen()
@@ -145,7 +157,7 @@ player_group = pygame.sprite.Group()
 item_group = pygame.sprite.Group()
 
 level_map = None
-player, level_x, level_y = generate_level(load_level('level4.txt'))
+player, level_x, level_y = generate_level(load_level('level5.txt'))
 run = True
 while run:
     for event in pygame.event.get():
@@ -160,8 +172,11 @@ while run:
             player.update(-tile_width, 0)
         if key[pygame.K_RIGHT]:
             player.update(tile_width, 0)
+    item_group.update()
     screen.fill((0, 0, 0))
     tiles_group.draw(screen)
+    item_group.draw(screen)
     player_group.draw(screen)
+
     pygame.display.flip()
 terminate()
