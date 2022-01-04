@@ -17,8 +17,9 @@ screen = pygame.display.set_mode(size)
 clock = pygame.time.Clock()
 level_list = ['level1.txt', 'level2.txt', 'level3.txt', 'level4.txt', 'level5.txt']
 items = ['axe.png', 'ring.png', 'sword.png', 'spear.png', 'crown.png']
+items_complete = [570, 620, 670, 720, 770]
 sp = []
-level = 4
+level = 0
 stage = 570
 
 
@@ -65,8 +66,9 @@ def generate_level(level):
             if level[y][x] == '.':
                 Tile('empty', x, y)
                 if item_qa < 5:
-                    Item(cords[item_num][1], cords[item_num][0], items[item_num])
-                    first = Item(cords[item_num][1], cords[item_num][0], items[item_num])
+                    Item(cords[item_num][1], cords[item_num][0], items[item_num],
+                         items_complete[item_num])
+                    first = Item(cords[item_num][1], cords[item_num][0], items[item_num], 0)
                     Item.dvish(first, stage, 30)
                     item_qa += 1
                     item_num += 1
@@ -141,8 +143,10 @@ class Player(pygame.sprite.Sprite):
 
 class Item(pygame.sprite.Sprite):
 
-    def __init__(self, pos_x, pos_y, name):
+    def __init__(self, pos_x, pos_y, name, complete_cord):
+        self.complete = load_image('galka.png', -1)
         self.sp = sp
+        self.stage = complete_cord
         self.name = name
         super().__init__(item_group, all_sprites)
         self.image = load_image(self.name, -1)
@@ -152,9 +156,9 @@ class Item(pygame.sprite.Sprite):
     def update(self):
         if pygame.sprite.spritecollideany(self, player_group):
             self.sp.append(self.name)
-            self.rect = self.image.get_rect().move(800, 30)
+            self.rect = self.image.get_rect().move(self.stage, 60)
             self.image.set_colorkey((255, 255, 255))
-            # print(self.sp)
+            self.image = self.complete
 
     def dvish(self, x, y):
         self.rect = self.image.get_rect().move(x, y)
@@ -192,9 +196,11 @@ while run:
             if len(sp) == len(items):
                 level += 1
                 stage = 570
+                stage1 = 570
                 pygame.sprite.Group.empty(tiles_group)
                 pygame.sprite.Group.empty(player_group)
                 pygame.sprite.Group.empty(item_group)
+
                 if level > len(level_list) - 1:
                     start_screen('fon4.jpg')
                     terminate()
