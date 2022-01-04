@@ -17,7 +17,9 @@ screen = pygame.display.set_mode(size)
 clock = pygame.time.Clock()
 level_list = ['level1.txt', 'level2.txt', 'level3.txt', 'level4.txt', 'level5.txt']
 items = ['axe.png', 'ring.png', 'sword.png', 'spear.png', 'crown.png']
-sp =[]
+sp = []
+level = 0
+
 
 def load_image(name, colorkey=None):
     fullname = os.path.join('data', name)
@@ -157,7 +159,7 @@ player_group = pygame.sprite.Group()
 item_group = pygame.sprite.Group()
 
 level_map = None
-player, level_x, level_y = generate_level(load_level('level5.txt'))
+player, level_x, level_y = generate_level(load_level('level1.txt'))
 run = True
 while run:
     for event in pygame.event.get():
@@ -172,6 +174,13 @@ while run:
             player.update(-tile_width, 0)
         if key[pygame.K_RIGHT]:
             player.update(tile_width, 0)
+        if len(sp) == len(items):
+            level += 1
+            pygame.sprite.Group.empty(tiles_group)
+            pygame.sprite.Group.empty(player_group)
+            pygame.sprite.Group.empty(item_group)
+            player, level_x, level_y = generate_level(load_level(level_list[level]))
+            del sp[:]
     item_group.update()
     screen.fill((0, 0, 0))
     tiles_group.draw(screen)
