@@ -18,7 +18,7 @@ clock = pygame.time.Clock()
 level_list = ['level1.txt', 'level2.txt', 'level3.txt', 'level4.txt', 'level5.txt']
 items = ['axe.png', 'ring.png', 'sword.png', 'spear.png', 'crown.png']
 sp = []
-level = 0
+level = 4
 stage = 570
 
 
@@ -160,8 +160,8 @@ class Item(pygame.sprite.Sprite):
         self.rect = self.image.get_rect().move(x, y)
 
 
-'''start_screen('game design.jpg')
-start_screen('fon2.jpg', True)'''
+start_screen('game design.jpg')
+start_screen('fon2.jpg', True)
 
 all_sprites = pygame.sprite.Group()
 tiles_group = pygame.sprite.Group()
@@ -169,7 +169,7 @@ player_group = pygame.sprite.Group()
 item_group = pygame.sprite.Group()
 
 level_map = None
-player, level_x, level_y = generate_level(load_level('level1.txt'))
+player, level_x, level_y = generate_level(load_level(level_list[level]))
 run = True
 while run:
     for event in pygame.event.get():
@@ -184,6 +184,7 @@ while run:
             player.update(-tile_width, 0)
         if key[pygame.K_RIGHT]:
             player.update(tile_width, 0)
+
         if bool(sp) is True and sp[:len(sp)] != items[:len(sp)]:
             start_screen('fon3.jpg')
             terminate()
@@ -194,6 +195,9 @@ while run:
                 pygame.sprite.Group.empty(tiles_group)
                 pygame.sprite.Group.empty(player_group)
                 pygame.sprite.Group.empty(item_group)
+                if level > len(level_list) - 1:
+                    start_screen('fon4.jpg')
+                    terminate()
                 player, level_x, level_y = generate_level(load_level(level_list[level]))
                 del sp[:]
     item_group.update()
