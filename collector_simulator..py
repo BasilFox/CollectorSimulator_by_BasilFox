@@ -44,6 +44,8 @@ def load_level(filename):
 
 
 def generate_level(level):
+    random.shuffle(items)
+    global stage
     posl = range(11)
     cords = []
     for i in range(5):
@@ -64,8 +66,11 @@ def generate_level(level):
                 Tile('empty', x, y)
                 if item_qa < 5:
                     Item(cords[item_num][1], cords[item_num][0], items[item_num])
+                    first = Item(cords[item_num][1], cords[item_num][0], items[item_num])
+                    Item.dvish(first, stage, 30)
                     item_qa += 1
                     item_num += 1
+                    stage += 50
             elif level[y][x] == '#':
                 Tile('wall', x, y)
             elif level[y][x] == '@':
@@ -79,7 +84,7 @@ def terminate():
     sys.exit()
 
 
-def start_screen(name, flag = False):
+def start_screen(name, flag=False):
     intro_text = ["Правила игры",
                   "1. Собери предметы в правильном порядке",
                   "2. Успей за 30 секунд"]
@@ -149,11 +154,14 @@ class Item(pygame.sprite.Sprite):
             self.sp.append(self.name)
             self.rect = self.image.get_rect().move(800, 30)
             self.image.set_colorkey((255, 255, 255))
-            print(self.sp)
+            # print(self.sp)
+
+    def dvish(self, x, y):
+        self.rect = self.image.get_rect().move(x, y)
 
 
-start_screen('game design.jpg')
-start_screen('fon2.jpg', True)
+'''start_screen('game design.jpg')
+start_screen('fon2.jpg', True)'''
 
 all_sprites = pygame.sprite.Group()
 tiles_group = pygame.sprite.Group()
@@ -176,14 +184,18 @@ while run:
             player.update(-tile_width, 0)
         if key[pygame.K_RIGHT]:
             player.update(tile_width, 0)
-        if len(sp) == len(items):
-            level += 1
-            stage = 570
-            pygame.sprite.Group.empty(tiles_group)
-            pygame.sprite.Group.empty(player_group)
-            pygame.sprite.Group.empty(item_group)
-            player, level_x, level_y = generate_level(load_level(level_list[level]))
-            del sp[:]
+        if bool(sp) is True and sp[:len(sp)] != items[:len(sp)]:
+            start_screen('fon3.jpg')
+            terminate()
+        else:
+            if len(sp) == len(items):
+                level += 1
+                stage = 570
+                pygame.sprite.Group.empty(tiles_group)
+                pygame.sprite.Group.empty(player_group)
+                pygame.sprite.Group.empty(item_group)
+                player, level_x, level_y = generate_level(load_level(level_list[level]))
+                del sp[:]
     item_group.update()
     screen.fill((0, 0, 0))
     tiles_group.draw(screen)
