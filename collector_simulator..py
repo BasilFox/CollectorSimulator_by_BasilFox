@@ -19,6 +19,7 @@ level_list = ['level1.txt', 'level2.txt', 'level3.txt', 'level4.txt', 'level5.tx
 items = ['axe.png', 'ring.png', 'sword.png', 'spear.png', 'crown.png']
 sp = []
 level = 0
+stage = 570
 
 
 def load_image(name, colorkey=None):
@@ -78,24 +79,24 @@ def terminate():
     sys.exit()
 
 
-def start_screen():
-    intro_text = ["ЗАСТАВКА",
-                  "Правила игры",
-                  "Если в правилах несколько строк,",
-                  "приходится выводить их построчно"]
+def start_screen(name, flag = False):
+    intro_text = ["Правила игры",
+                  "1. Собери предметы в правильном порядке",
+                  "2. Успей за 30 секунд"]
 
-    fon = pygame.transform.scale(load_image('game design.jpg'), (800, 550))
+    fon = pygame.transform.scale(load_image(name), (800, 550))
     screen.blit(fon, (0, 0))
     font = pygame.font.Font(None, 30)
     text_coord = 50
-    '''for line in intro_text:
-        string_rendered = font.render(line, 1, pygame.Color('black'))
-        intro_rect = string_rendered.get_rect()
-        text_coord += 10
-        intro_rect.top = text_coord
-        intro_rect.x = 10
-        text_coord += intro_rect.height
-        screen.blit(string_rendered, intro_rect)'''
+    if flag is True:
+        for line in intro_text:
+            string_rendered = font.render(line, 1, pygame.Color('white'))
+            intro_rect = string_rendered.get_rect()
+            text_coord += 10
+            intro_rect.top = text_coord
+            intro_rect.x = 10
+            text_coord += intro_rect.height
+            screen.blit(string_rendered, intro_rect)
 
     while True:
         for event in pygame.event.get():
@@ -146,12 +147,13 @@ class Item(pygame.sprite.Sprite):
     def update(self):
         if pygame.sprite.spritecollideany(self, player_group):
             self.sp.append(self.name)
-            self.rect = self.image.get_rect().move(800, 550)
+            self.rect = self.image.get_rect().move(800, 30)
             self.image.set_colorkey((255, 255, 255))
             print(self.sp)
 
 
-# start_screen()
+start_screen('game design.jpg')
+start_screen('fon2.jpg', True)
 
 all_sprites = pygame.sprite.Group()
 tiles_group = pygame.sprite.Group()
@@ -176,6 +178,7 @@ while run:
             player.update(tile_width, 0)
         if len(sp) == len(items):
             level += 1
+            stage = 570
             pygame.sprite.Group.empty(tiles_group)
             pygame.sprite.Group.empty(player_group)
             pygame.sprite.Group.empty(item_group)
