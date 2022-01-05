@@ -25,6 +25,13 @@ pygame.time.set_timer(pygame.USEREVENT, 1000)
 counter, text = 30, '30'.rjust(3)
 font = pygame.font.SysFont('Consolas', 30)
 
+pygame.mixer.music.load('data/main_theme.mp3')
+pygame.mixer.music.play()
+sound1 = pygame.mixer.Sound('data/sbor.mp3')
+sound2 = pygame.mixer.Sound('data/perehod.mp3')
+sound3 = pygame.mixer.Sound('data/win.mp3')
+sound4 = pygame.mixer.Sound('data/game_over.mp3')
+
 
 def load_image(name, colorkey=None):
     fullname = os.path.join('data', name)
@@ -165,6 +172,9 @@ class Item(pygame.sprite.Sprite):
             self.rect = self.image.get_rect().move(self.stage, 60)
             self.image.set_colorkey((255, 255, 255))
             self.image = self.complete
+            pygame.mixer.music.pause()
+            sound1.play()
+            pygame.mixer.music.unpause()
 
     def dvish(self, x, y):
         self.rect = self.image.get_rect().move(x, y)
@@ -182,7 +192,7 @@ player, level_x, level_y = generate_level(load_level(level_list[level]))
 run = True
 while run:
     for event in pygame.event.get():
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE or\
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE or \
                 event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
             time_on = not time_on
         if event.type == pygame.QUIT:
@@ -203,10 +213,14 @@ while run:
             if counter > 0:
                 text = str(counter).rjust(3)
             else:
+                pygame.mixer.music.pause()
+                sound4.play()
                 start_screen('fon3.jpg')
                 terminate()
 
         if bool(sp) is True and sp[:len(sp)] != items[:len(sp)]:
+            pygame.mixer.music.pause()
+            sound4.play()
             start_screen('fon3.jpg')
             terminate()
         else:
@@ -219,11 +233,17 @@ while run:
                 pygame.sprite.Group.empty(item_group)
 
                 if level > len(level_list) - 1:
+                    pygame.mixer.music.pause()
+                    sound3.play()
                     start_screen('fon4.jpg')
                     terminate()
                 player, level_x, level_y = generate_level(load_level(level_list[level]))
+                pygame.mixer.music.pause()
+                sound2.play()
+                pygame.mixer.music.unpause()
                 del sp[:]
     item_group.update()
+
     screen.fill((0, 0, 0))
     tiles_group.draw(screen)
     item_group.draw(screen)
