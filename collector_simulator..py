@@ -21,6 +21,9 @@ items_complete = [570, 620, 670, 720, 770]
 sp = []
 level = 0
 stage = 570
+pygame.time.set_timer(pygame.USEREVENT, 1000)
+counter, text = 30, '30'.rjust(3)
+font = pygame.font.SysFont('Consolas', 30)
 
 
 def load_image(name, colorkey=None):
@@ -45,6 +48,8 @@ def load_level(filename):
 
 
 def generate_level(level):
+    global counter
+    counter = 30
     random.shuffle(items)
     global stage
     posl = range(11)
@@ -89,7 +94,8 @@ def terminate():
 def start_screen(name, flag=False):
     intro_text = ["Правила игры",
                   "1. Собери предметы в правильном порядке",
-                  "2. Успей за 30 секунд"]
+                  "2. Успей за 30 секунд",
+                  '3 Для паузы нажми пробел']
 
     fon = pygame.transform.scale(load_image(name), (800, 550))
     screen.blit(fon, (0, 0))
@@ -166,17 +172,19 @@ class Item(pygame.sprite.Sprite):
 
 start_screen('game design.jpg')
 start_screen('fon2.jpg', True)
-
 all_sprites = pygame.sprite.Group()
 tiles_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
 item_group = pygame.sprite.Group()
-
+time_on = True
 level_map = None
 player, level_x, level_y = generate_level(load_level(level_list[level]))
 run = True
 while run:
     for event in pygame.event.get():
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE or\
+                event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
+            time_on = not time_on
         if event.type == pygame.QUIT:
             run = False
         key = pygame.key.get_pressed()
@@ -188,6 +196,15 @@ while run:
             player.update(-tile_width, 0)
         if key[pygame.K_RIGHT]:
             player.update(tile_width, 0)
+        if key[pygame.K_RIGHT] or key[pygame.K_LEFT] or key[pygame.K_UP] or key[pygame.K_DOWN]:
+            time_on = True
+        if event.type == pygame.USEREVENT and time_on is True:
+            counter -= 1
+            if counter > 0:
+                text = str(counter).rjust(3)
+            else:
+                start_screen('fon3.jpg')
+                terminate()
 
         if bool(sp) is True and sp[:len(sp)] != items[:len(sp)]:
             start_screen('fon3.jpg')
@@ -211,6 +228,7 @@ while run:
     tiles_group.draw(screen)
     item_group.draw(screen)
     player_group.draw(screen)
-
+    screen.blit(font.render(text, True, (255, 255, 255)), (650, 120))
     pygame.display.flip()
+    clock.tick(60)
 terminate()
