@@ -25,8 +25,7 @@ pygame.time.set_timer(pygame.USEREVENT, 1000)
 counter, text = 30, '30'.rjust(3)
 font = pygame.font.SysFont('Consolas', 30)
 
-pygame.mixer.music.load('data/main_theme.mp3')
-pygame.mixer.music.play()
+
 sound1 = pygame.mixer.Sound('data/sbor.mp3')
 sound2 = pygame.mixer.Sound('data/perehod.mp3')
 sound3 = pygame.mixer.Sound('data/win.mp3')
@@ -55,6 +54,8 @@ def load_level(filename):
 
 
 def generate_level(level):
+    pygame.mixer.music.load('data/main_theme.mp3')
+    pygame.mixer.music.play()
     global counter
     counter = 30
     random.shuffle(items)
@@ -179,7 +180,8 @@ class Item(pygame.sprite.Sprite):
     def dvish(self, x, y):
         self.rect = self.image.get_rect().move(x, y)
 
-
+pygame.mixer.music.load('data/main_theme.mp3')
+pygame.mixer.music.play()
 start_screen('game design.jpg')
 start_screen('fon2.jpg', True)
 all_sprites = pygame.sprite.Group()
